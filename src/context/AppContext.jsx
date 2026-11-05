@@ -7,18 +7,17 @@ function enrichStudent(s) {
   const avatarColors = ['#a6f2cf', '#e0d4fd', '#ffe24c', '#ffdad6', '#cbe6ff', '#e2e3dd'];
   const avatarBg = avatarColors[(s.id - 1) % avatarColors.length];
   
-  // Real active semester schedule matching Thursday Nov 5 (Class Day 10 of 108):
-  // Class Days 1–9 (Oct 26 - Nov 4) are completed & returned
-  // Class Day 10 (Thursday Nov 5) is Active Duty Today (#10 Sreyleak Neth)
-  // Class Day 11 is Up Next Tomorrow (#11 Dara Ouk)
-  // Class Days 12–30 are In Queue
-  const defaultStatus = s.id <= 9 ? 'done' : s.id === 10 ? 'active' : s.id === 11 ? 'tomorrow' : 'waiting';
+  // Clean start from current day with fresh classmates:
+  // Slots #01 - #04 are Active Today (Thursday Nov 5)
+  // Slots #05 - #08 are Up Next Tomorrow
+  // Slots #09 - #30 are In Queue
+  const defaultStatus = s.id <= 4 ? 'active' : s.id <= 8 ? 'tomorrow' : 'waiting';
   
   return {
     ...s,
     slotNumber: s.slotNumber || slotNumber,
     status: s.status || defaultStatus,
-    returned: s.returned !== undefined ? s.returned : (s.id <= 9),
+    returned: s.returned !== undefined ? s.returned : false,
     room: s.room || 'Room 205 (Building B)',
     duty: s.duty || 'Prepare projector & clean whiteboard',
     avatarBg: s.avatarBg || avatarBg,
@@ -26,9 +25,10 @@ function enrichStudent(s) {
 }
 
 export function AppProvider({ children }) {
-  // Clear legacy stored states so all users get clean synchronized active state
+  // Clear legacy stored states so users get the fresh synchronized state
   useEffect(() => {
     try {
+      localStorage.removeItem('projector_duty_students_v6');
       localStorage.removeItem('projector_duty_students_v5');
       localStorage.removeItem('projector_duty_students_v4');
       localStorage.removeItem('projector_duty_students_v3');
@@ -49,9 +49,14 @@ export function AppProvider({ children }) {
     return () => clearInterval(timer);
   }, []);
 
+  // Duty cycle start date anchor (defaults to current date '2026-11-05')
+  const [dutyStartDate, setDutyStartDate] = useState(() => {
+    return localStorage.getItem('projector_duty_start_date') || '2026-11-05';
+  });
+
   const [students, setStudents] = useState(() => {
     const base = initialStudents.map(enrichStudent);
-    const saved = localStorage.getItem('projector_duty_students_v6');
+    const saved = localStorage.getItem('projector_duty_students_v7');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -68,17 +73,36 @@ export function AppProvider({ children }) {
 
   const [toast, setToast] = useState({ show: false, message: '', type: 'info' });
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
 
   // Sync with localStorage
   useEffect(() => {
-    localStorage.setItem('projector_duty_students_v6', JSON.stringify(students));
+    localStorage.setItem('projector_duty_students_v7', JSON.stringify(students));
   }, [students]);
+
+  useEffect(() => {
+    localStorage.setItem('projector_duty_start_date', dutyStartDate);
+  }, [dutyStartDate]);
 
   const showToast = (message, type = 'info') => {
     setToast({ show: true, message, type });
     setTimeout(() => {
       setToast(prev => ({ ...prev, show: false }));
     }, 3200);
+  };
+
+  const openResetModal = () => setIsResetModalOpen(true);
+  const closeResetModal = () => setIsResetModalOpen(false);
+
+  const restartDutyCycle = () => {
+    const todayIso = (currentDate || new Date()).toISOString().split('T')[0];
+    setDutyStartDate(todayIso);
+    localStorage.setItem('projector_duty_start_date', todayIso);
+
+    const freshStudents = initialStudents.map(enrichStudent);
+    setStudents(freshStudents);
+    localStorage.setItem('projector_duty_students_v7', JSON.stringify(freshStudents));
+    showToast("Duty cycle restarted starting today with fresh classmates!", "success");
   };
 
   const markDelivered = (studentId) => {
@@ -115,9 +139,7 @@ export function AppProvider({ children }) {
   };
 
   const resetAllData = () => {
-    localStorage.removeItem('projector_duty_students_v6');
-    setStudents(initialStudents.map(enrichStudent));
-    showToast("Reset duty roster to synchronized active schedule");
+    openResetModal();
   };
 
   const todayStudents = students.filter(s => s.status === 'active');
@@ -129,6 +151,7 @@ export function AppProvider({ children }) {
       value={{
         students,
         currentDate,
+        dutyStartDate,
         todayStudents,
         doneStudents,
         waitingStudents,
@@ -141,6 +164,10 @@ export function AppProvider({ children }) {
         updateStudentStatus,
         shufflePreview,
         resetAllData,
+        isResetModalOpen,
+        openResetModal,
+        closeResetModal,
+        restartDutyCycle,
       }}
     >
       {children}

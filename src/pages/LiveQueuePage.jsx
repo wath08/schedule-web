@@ -23,17 +23,6 @@ import {
   TOTAL_CLASS_DAYS
 } from '../utils/semester';
 
-// 4 students assigned per day (Friday is Computer Lab day, so no projector needed!)
-const SQUAD_MAP = {
-  Monday: [1, 2, 3, 4],
-  Tuesday: [5, 6, 7, 8],
-  Wednesday: [7, 8, 9, 10],
-  Thursday: [9, 10, 11, 12],
-  Friday: [], // Friday is Computer Lab Day (Lab 203 & 204 Building A) - Zero projector duty!
-  Saturday: [13, 14, 15, 16],
-  Sunday: []  // Sunday is Rest Day
-};
-
 const DUTY_ROLES = [
   'Lead Carrier & Pickup',
   'Cables & Power Setup',
@@ -45,7 +34,8 @@ export default function LiveQueuePage() {
   const { 
     students, 
     setSelectedStudent,
-    currentDate
+    currentDate,
+    dutyStartDate
   } = useApp();
 
   // Semester & week calculations (dynamically tracks real client time and midnight rollover)
@@ -71,6 +61,8 @@ export default function LiveQueuePage() {
   const selectedDayInfo = currentWeekDays.find(d => d.dayName === selectedDayName) || currentWeekDays[0];
   const isSelectedSunday = selectedDayName === 'Sunday';
   const isSelectedFriday = selectedDayName === 'Friday';
+  const selectedDayIso = selectedDayInfo?.isoDate;
+  const isPreStart = Boolean(dutyStartDate && selectedDayIso && selectedDayIso < dutyStartDate);
 
   // Handler to change day and smoothly scroll up to the top so names are immediately visible
   const handleSelectDay = (dayName) => {
@@ -78,11 +70,37 @@ export default function LiveQueuePage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Get the 4 classmates for the selected day
-  const squadStudentIds = SQUAD_MAP[selectedDayName] || [];
-  const squadStudents = squadStudentIds
-    .map(id => students.find(s => s.id === id))
-    .filter(Boolean);
+  // Get the 4 classmates for the selected day based on active duty start date
+  let squadStudents = [];
+  if (!isSelectedSunday && !isSelectedFriday && !isPreStart) {
+    const start = new Date(dutyStartDate || '2026-11-05');
+    const target = new Date(selectedDayIso || '2026-11-05');
+
+    let dutyDayIndex = 0;
+    if (target >= start) {
+      const temp = new Date(start);
+      while (temp < target) {
+        const dow = temp.getDay();
+        // Monday (1), Tuesday (2), Wednesday (3), Thursday (4), Saturday (6)
+        if (dow === 1 || dow === 2 || dow === 3 || dow === 4 || dow === 6) {
+          dutyDayIndex++;
+        }
+        temp.setDate(temp.getDate() + 1);
+      }
+    }
+
+    const baseSlot = (dutyDayIndex * 4) % 30 + 1;
+    const studentIds = [
+      baseSlot,
+      ((baseSlot) % 30) + 1,
+      ((baseSlot + 1) % 30) + 1,
+      ((baseSlot + 2) % 30) + 1
+    ];
+
+    squadStudents = studentIds
+      .map(id => students.find(s => s.id === id))
+      .filter(Boolean);
+  }
 
   return (
     <div className="flex flex-col gap-5 sm:gap-8 pb-14">
@@ -112,6 +130,8 @@ export default function LiveQueuePage() {
                   ? 'Sunday Rest Day' 
                   : isSelectedFriday
                   ? 'Friday Computer Lab Day'
+                  : isPreStart
+                  ? `${selectedDayName} (Pre-start Day)`
                   : `${selectedDayName} Projector Duty Squad (4 Classmates)`}
               </h2>
               <p className="font-['Plus_Jakarta_Sans'] text-xs sm:text-sm text-[#48454d] mt-0.5">
@@ -119,6 +139,8 @@ export default function LiveQueuePage() {
                   ? 'No lectures scheduled. Classmates rest and prepare for next week.'
                   : isSelectedFriday
                   ? 'Classes meet in Lab 203 & 204 Building A. No projector duty needed!'
+                  : isPreStart
+                  ? 'This day occurred before the start of the current duty cycle.'
                   : 'Responsible for bringing the projector, setting up power cables in Room 205, and returning equipment after lecture.'
                 }
               </p>
@@ -135,6 +157,11 @@ export default function LiveQueuePage() {
                   <Moon className="w-4 h-4 text-[#ba1a1a]" />
                   <span>Sunday Pass • 100% Chill</span>
                 </div>
+              ) : isPreStart ? (
+                <div className="bg-[#f1eee5] text-[#48454d] px-3 py-1 rounded-xl border border-[#1c1c17] font-['Space_Grotesk'] text-xs font-bold flex items-center gap-1.5 shadow-[2px_2px_0px_#1c1c17]">
+                  <Clock className="w-4 h-4 text-[#62597c]" />
+                  <span>Pre-cycle Day</span>
+                </div>
               ) : (
                 <div className="bg-[#a6f2cf] text-[#002115] px-3 py-1 rounded-xl border border-[#1c1c17] font-['Space_Grotesk'] text-xs font-bold flex items-center gap-1.5 shadow-[2px_2px_0px_#1c1c17]">
                   <ShieldCheck className="w-4 h-4 text-[#1b6b4f]" />
@@ -144,7 +171,7 @@ export default function LiveQueuePage() {
             </div>
           </div>
 
-          {/* Conditional Content: Sunday Cat Meme vs Friday Lab Meme vs 4 Classmate Cards */}
+          {/* Conditional Content: Sunday Cat Meme vs Friday Lab Meme vs Pre-start Screen vs 4 Classmate Cards */}
           {isSelectedSunday ? (
             /* Sunday Funny Meme: Transparent Clapping Cat Video with Audio */
             <ChromaKeyCatMeme />
@@ -169,8 +196,21 @@ export default function LiveQueuePage() {
                 </p>
               </div>
             </div>
+          ) : isPreStart ? (
+            /* Pre-start Day: Duty cycle started later */
+            <div className="bg-[#fcf9f0] border-2 border-[#1c1c17] rounded-2xl p-6 sm:p-8 shadow-[3px_3px_0px_#1c1c17] flex flex-col items-center justify-center text-center gap-2">
+              <span className="font-['Space_Grotesk'] text-xs font-bold uppercase px-3 py-1 rounded-full border border-[#1c1c17] bg-[#f1eee5] text-[#48454d]">
+                Pre-start Day
+              </span>
+              <h3 className="font-['Space_Grotesk'] text-lg sm:text-xl font-bold text-[#1c1c17] mt-1">
+                Duty Cycle Started Today ({todayDayName})
+              </h3>
+              <p className="font-['Plus_Jakarta_Sans'] text-xs sm:text-sm text-[#48454d] max-w-md">
+                No projector duties were scheduled for this day in the current rotation. Select Today ({todayDayName}) to view active classmates.
+              </p>
+            </div>
           ) : (
-            /* 4 Classmate Cards for Normal Class Days (Mon, Tue, Wed, Thu, Sat) */
+            /* 4 Classmate Cards for Normal Class Days */
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
               {squadStudents.map((st, idx) => (
                 <div
@@ -281,8 +321,9 @@ export default function LiveQueuePage() {
             const isSunday = day.isOffDay;
             const isFriday = day.dayName === 'Friday';
             const isToday = day.isToday;
-            const isPast = day.isPast;
-            const isTomorrow = day.assignedStudent?.status === 'tomorrow' || (day.isUpcoming && day.dayName === 'Friday');
+            const isDayPreStart = Boolean(dutyStartDate && day.isoDate && day.isoDate < dutyStartDate);
+            const isPast = day.isPast && !isDayPreStart;
+            const isTomorrow = day.assignedStudent?.status === 'tomorrow' || (day.isUpcoming && day.dayName === 'Friday') || (day.dayName === 'Saturday' && todayDayName === 'Thursday');
             const dayAbbr = day.dayName.substring(0, 3).toUpperCase();
 
             return (
@@ -301,6 +342,8 @@ export default function LiveQueuePage() {
                     ? 'bg-[#f4effe] shadow-[2px_2px_0px_#1c1c17] hover:bg-[#e0d4fd]'
                     : isSunday
                     ? 'bg-[#fcf9f0] shadow-[2px_2px_0px_#1c1c17] hover:bg-[#ebe8df]'
+                    : isDayPreStart
+                    ? 'bg-[#f6f3ea] opacity-80 hover:opacity-100 shadow-[1px_1px_0px_#1c1c17]'
                     : 'bg-white hover:bg-[#fcf9f0] shadow-[2px_2px_0px_#1c1c17]'
                 }`}
               >
@@ -325,10 +368,10 @@ export default function LiveQueuePage() {
                 {/* Center: Squad Tag */}
                 <div className="py-2">
                   <span className="font-['Space_Grotesk'] text-xs font-bold text-[#1c1c17] block">
-                    {isSunday ? 'Rest Day' : isFriday ? 'Lab Day' : '4 On Duty'}
+                    {isSunday ? 'Rest Day' : isFriday ? 'Lab Day' : isDayPreStart ? 'Pre-start' : '4 On Duty'}
                   </span>
                   <span className="text-[10px] font-['Plus_Jakarta_Sans'] text-[#48454d] block">
-                    {isSunday ? 'No duty' : isFriday ? 'No Projector' : 'Projector Squad'}
+                    {isSunday ? 'No duty' : isFriday ? 'No Projector' : isDayPreStart ? 'Not started' : 'Projector Squad'}
                   </span>
                 </div>
 
@@ -341,6 +384,8 @@ export default function LiveQueuePage() {
                       ? 'bg-[#1c1c17] text-[#ffe24c] border-[#1c1c17]'
                       : isFriday
                       ? 'bg-[#d0e4ff] text-[#004a77] border-[#1c1c17]'
+                      : isDayPreStart
+                      ? 'bg-[#f1eee5] text-[#62597c] border-[#1c1c17]'
                       : isPast
                       ? 'bg-[#a6f2cf] text-[#002115] border-[#1c1c17]'
                       : isTomorrow
@@ -351,6 +396,7 @@ export default function LiveQueuePage() {
                   }`}>
                     {isToday ? 'Live Today' :
                      isFriday ? 'Lab Pass' :
+                     isDayPreStart ? 'Pre-start' :
                      isPast ? 'Done' :
                      isTomorrow ? 'Tomorrow' :
                      isSunday ? 'Off Day' : 'Upcoming'}

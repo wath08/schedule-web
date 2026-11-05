@@ -10,7 +10,7 @@ import {
 import { useApp } from '../context/useApp';
 
 export default function StudentsRosterPage() {
-  const { students, setSelectedStudent, resetAllData } = useApp();
+  const { students, setSelectedStudent, openResetModal } = useApp();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   
@@ -65,12 +65,12 @@ export default function StudentsRosterPage() {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={resetAllData}
-            className="bg-[#f6f3ea] hover:bg-[#ffe24c] px-3.5 py-1.5 rounded-xl border-2 border-[#1c1c17] font-['Space_Grotesk'] text-xs font-bold text-[#1c1c17] shadow-[2px_2px_0px_#1c1c17] active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer flex items-center gap-1.5"
-            title="Reset duty roster to match active semester schedule"
+            onClick={openResetModal}
+            className="bg-[#ffe24c] hover:bg-yellow-300 text-[#1c1c17] px-3.5 py-1.5 rounded-xl border-2 border-[#1c1c17] font-['Space_Grotesk'] text-xs font-bold shadow-[2px_2px_0px_#1c1c17] active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer flex items-center gap-1.5"
+            title="Reset duty rotation starting today (Admin password required)"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span>Reset Roster</span>
+            <span>Reset Duty</span>
           </button>
           <div className="bg-[#f6f3ea] px-3.5 py-1.5 rounded-xl border border-[#1c1c17] font-['Space_Grotesk'] text-xs font-bold text-[#1c1c17]">
             Classmates Registered

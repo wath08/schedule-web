@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import Toast from './components/Toast';
 import StudentDetailModal from './components/StudentDetailModal';
+import ResetDutyModal from './components/ResetDutyModal';
 
 // Pages
 import LiveQueuePage from './pages/LiveQueuePage';
@@ -42,6 +43,9 @@ export default function App() {
 
           {/* Student Profile & Presentation Inspection Modal */}
           <StudentDetailModal />
+
+          {/* Reset Duty Password Security Modal */}
+          <ResetDutyModal />
         </div>
       </BrowserRouter>
     </AppProvider>
