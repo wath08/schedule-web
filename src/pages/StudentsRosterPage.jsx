@@ -67,10 +67,10 @@ export default function StudentsRosterPage() {
             type="button"
             onClick={resetAllData}
             className="bg-[#f6f3ea] hover:bg-[#ffe24c] px-3.5 py-1.5 rounded-xl border-2 border-[#1c1c17] font-['Space_Grotesk'] text-xs font-bold text-[#1c1c17] shadow-[2px_2px_0px_#1c1c17] active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer flex items-center gap-1.5"
-            title="Restart duty status back to unstarted"
+            title="Reset duty roster to match active semester schedule"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span>Restart Duty</span>
+            <span>Reset Roster</span>
           </button>
           <div className="bg-[#f6f3ea] px-3.5 py-1.5 rounded-xl border border-[#1c1c17] font-['Space_Grotesk'] text-xs font-bold text-[#1c1c17]">
             Classmates Registered
