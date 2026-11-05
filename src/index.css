@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-float {
+  animation: float 3.5s ease-in-out infinite;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1eee5;
+  border-left: 2px solid #1c1c17;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e0d4fd;
+  border: 2px solid #1c1c17;
+  border-radius: 4px;
+}

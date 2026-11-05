@@ -1,0 +1,281 @@
+{
+  "institution": "Royal University of Phnom Penh (RUPP)",
+  "ministry": "Ministry of Education, Youth and Sports",
+  "motto": "Kingdom of Cambodia: Nation, Religion, King",
+  "faculty": "Faculty of Science",
+  "department": "Department of Computer Science",
+  "major": "Computer Science and Engineering (Batch 29)",
+  "year": "Year 2",
+  "semester": "Semester 1",
+  "classGroup": "Class E2",
+  "cohort": "Gen 29",
+  "classroom": "Room 205, Building B",
+  "startDate": "2026-10-26",
+  "endDate": "2027-02-27",
+  "periodDates": "26 October 2026 – 27 February 2027",
+  "totalWeeks": 18,
+  "shift": "Evening Shift (5:30 PM - 8:30 PM)",
+  "breakTime": "7:00 PM - 7:15 PM (15 Minutes)",
+  "courses": [
+    {
+      "id": "edc",
+      "code": "CS-201",
+      "name": "Essential Data Communications",
+      "lecturer": "Mr. Péng Kun",
+      "room": "Room 205 (Building B)",
+      "days": ["Monday", "Wednesday"],
+      "scheduleSlots": [
+        { "day": "Monday", "period": "Period 1", "time": "5:30 PM - 7:00 PM", "room": "Room 205" },
+        { "day": "Wednesday", "period": "Period 2", "time": "7:15 PM - 8:30 PM", "room": "Room 205" }
+      ],
+      "color": {
+        "bg": "bg-[#e0d4fd]",
+        "border": "border-[#62597c]",
+        "badge": "bg-[#62597c] text-white",
+        "accent": "#62597c"
+      },
+      "tools": ["Cisco Packet Tracer", "Wireshark", "Network Subnetting"],
+      "projectorPriority": "High (Network topology diagrams & live slide lectures)",
+      "description": "Explores OSI & TCP/IP models, data transmission modes, packet routing, and network hardware."
+    },
+    {
+      "id": "dsa",
+      "code": "CS-202",
+      "name": "Data Structures & Algorithms I",
+      "lecturer": "Mr. Thap Boung",
+      "room": "Room 205 (Building B)",
+      "days": ["Monday", "Thursday"],
+      "scheduleSlots": [
+        { "day": "Monday", "period": "Period 2", "time": "7:15 PM - 8:30 PM", "room": "Room 205" },
+        { "day": "Thursday", "period": "Period 1", "time": "5:30 PM - 7:00 PM", "room": "Room 205" }
+      ],
+      "color": {
+        "bg": "bg-[#a6f2cf]",
+        "border": "border-[#1b6b4f]",
+        "badge": "bg-[#1b6b4f] text-white",
+        "accent": "#1b6b4f"
+      },
+      "tools": ["C++ / Java", "Time Complexity Analysis", "LeetCode / Problem Solving"],
+      "projectorPriority": "Critical (Live whiteboard code tracing & algorithm step demonstrations)",
+      "description": "Covers asymptotic notation, arrays, linked lists, stacks, queues, recursion, and sorting techniques."
+    },
+    {
+      "id": "db",
+      "code": "CS-203",
+      "name": "Database Systems Design",
+      "lecturer": "Mr. Phéng Oussaphea",
+      "room": "Room 205 (Tue) & Lab 203 (Fri)",
+      "days": ["Tuesday", "Friday"],
+      "scheduleSlots": [
+        { "day": "Tuesday", "period": "Period 1", "time": "5:30 PM - 7:00 PM", "room": "Room 205" },
+        { "day": "Friday", "period": "Period 2", "time": "7:15 PM - 8:30 PM", "room": "Lab 203" }
+      ],
+      "color": {
+        "bg": "bg-[#ffdad6]",
+        "border": "border-[#ba1a1a]",
+        "badge": "bg-[#ba1a1a] text-white",
+        "accent": "#ba1a1a"
+      },
+      "tools": ["MySQL / MariaDB", "PostgreSQL", "ERD Tools", "SQL Queries"],
+      "projectorPriority": "High (ER diagrams on Tuesday, Lab screen sharing on Friday)",
+      "description": "Relational data modeling, SQL queries, normalization (1NF-3NF), transactions, and database indexing."
+    },
+    {
+      "id": "eng",
+      "code": "EN-201",
+      "name": "Academic English for Reading & Writing",
+      "lecturer": "Mr. Nhoung Savoan",
+      "room": "Room 205 (Building B)",
+      "days": ["Tuesday", "Thursday"],
+      "scheduleSlots": [
+        { "day": "Tuesday", "period": "Period 2", "time": "7:15 PM - 8:30 PM", "room": "Room 205" },
+        { "day": "Thursday", "period": "Period 2", "time": "7:15 PM - 8:30 PM", "room": "Room 205" }
+      ],
+      "color": {
+        "bg": "bg-[#ffe24c]",
+        "border": "border-[#6d5e00]",
+        "badge": "bg-[#1c1c17] text-[#ffe24c]",
+        "accent": "#6d5e00"
+      },
+      "tools": ["Technical Writing", "Academic Journal Analysis", "Presentation Skills"],
+      "projectorPriority": "Medium (Reading comprehension slides & grammar breakdowns)",
+      "description": "Professional English composition, academic citations, reading strategies, and scientific report drafting."
+    },
+    {
+      "id": "java",
+      "code": "CS-204",
+      "name": "Core Java Programming",
+      "lecturer": "Mr. Chi Kuong",
+      "room": "Room 205 (Wed) & Lab 203 (Fri)",
+      "days": ["Wednesday", "Friday"],
+      "scheduleSlots": [
+        { "day": "Wednesday", "period": "Period 1", "time": "5:30 PM - 7:00 PM", "room": "Room 205" },
+        { "day": "Friday", "period": "Period 1", "time": "5:30 PM - 7:00 PM", "room": "Lab 203 Building A" }
+      ],
+      "color": {
+        "bg": "bg-[#d0e4ff]",
+        "border": "border-[#004a77]",
+        "badge": "bg-[#004a77] text-white",
+        "accent": "#004a77"
+      },
+      "tools": ["Java 21 LTS", "IntelliJ IDEA / VS Code", "OOP Architecture", "Maven"],
+      "projectorPriority": "Critical (Live coding sessions on Wednesday, hands-on lab in Lab 203 Building A on Friday)",
+      "description": "Object-Oriented Programming (OOP), encapsulation, inheritance, polymorphism, interfaces, collections, and exception handling."
+    },
+    {
+      "id": "arch",
+      "code": "CS-205",
+      "name": "Computer Architecture",
+      "lecturer": "Mr. Chim Bunthoeurn",
+      "room": "Room 205 (Building B)",
+      "days": ["Saturday"],
+      "scheduleSlots": [
+        { "day": "Saturday", "period": "Period 1", "time": "5:30 PM - 7:00 PM", "room": "Room 205" },
+        { "day": "Saturday", "period": "Period 2", "time": "7:15 PM - 8:30 PM", "room": "Room 205" }
+      ],
+      "color": {
+        "bg": "bg-[#f1eee5]",
+        "border": "border-[#48454d]",
+        "badge": "bg-[#1c1c17] text-white",
+        "accent": "#48454d"
+      },
+      "tools": ["Logisim / Digital Logic", "MIPS Assembly", "CPU Datapath"],
+      "projectorPriority": "High (Microarchitecture datapath diagrams and logic circuit simulation)",
+      "description": "Instruction set architectures (ISA), CPU datapath, memory hierarchy, cache design, pipelining, and bus structures."
+    }
+  ],
+  "schedule": {
+    "Monday": {
+      "dayName": "Monday",
+      "room": "Room 205 (Building B)",
+      "periods": [
+        {
+          "periodNum": 1,
+          "time": "5:30 PM - 7:00 PM",
+          "subject": "Essential Data Communications",
+          "lecturer": "Mr. Péng Kun",
+          "room": "Room 205",
+          "courseId": "edc"
+        },
+        {
+          "periodNum": 2,
+          "time": "7:15 PM - 8:30 PM",
+          "subject": "Data Structures & Algorithms I",
+          "lecturer": "Mr. Thap Boung",
+          "room": "Room 205",
+          "courseId": "dsa"
+        }
+      ]
+    },
+    "Tuesday": {
+      "dayName": "Tuesday",
+      "room": "Room 205 (Building B)",
+      "periods": [
+        {
+          "periodNum": 1,
+          "time": "5:30 PM - 7:00 PM",
+          "subject": "Database Systems Design",
+          "lecturer": "Mr. Phéng Oussaphea",
+          "room": "Room 205",
+          "courseId": "db"
+        },
+        {
+          "periodNum": 2,
+          "time": "7:15 PM - 8:30 PM",
+          "subject": "Academic English for Reading & Writing",
+          "lecturer": "Mr. Nhoung Savoan",
+          "room": "Room 205",
+          "courseId": "eng"
+        }
+      ]
+    },
+    "Wednesday": {
+      "dayName": "Wednesday",
+      "room": "Room 205 (Building B)",
+      "periods": [
+        {
+          "periodNum": 1,
+          "time": "5:30 PM - 7:00 PM",
+          "subject": "Core Java Programming",
+          "lecturer": "Mr. Chi Kuong",
+          "room": "Room 205",
+          "courseId": "java"
+        },
+        {
+          "periodNum": 2,
+          "time": "7:15 PM - 8:30 PM",
+          "subject": "Essential Data Communications",
+          "lecturer": "Mr. Péng Kun",
+          "room": "Room 205",
+          "courseId": "edc"
+        }
+      ]
+    },
+    "Thursday": {
+      "dayName": "Thursday",
+      "room": "Room 205 (Building B)",
+      "periods": [
+        {
+          "periodNum": 1,
+          "time": "5:30 PM - 7:00 PM",
+          "subject": "Data Structures & Algorithms I",
+          "lecturer": "Mr. Thap Boung",
+          "room": "Room 205",
+          "courseId": "dsa"
+        },
+        {
+          "periodNum": 2,
+          "time": "7:15 PM - 8:30 PM",
+          "subject": "Academic English for Reading & Writing",
+          "lecturer": "Mr. Nhoung Savoan",
+          "room": "Room 205",
+          "courseId": "eng"
+        }
+      ]
+    },
+    "Friday": {
+      "dayName": "Friday",
+      "room": "Lab 203 & 204 Building A",
+      "periods": [
+        {
+          "periodNum": 1,
+          "time": "5:30 PM - 7:00 PM",
+          "subject": "Core Java Programming",
+          "lecturer": "Mr. Chi Kuong",
+          "room": "Lab 203 (Building A)",
+          "courseId": "java"
+        },
+        {
+          "periodNum": 2,
+          "time": "7:15 PM - 8:30 PM",
+          "subject": "Database Systems Design",
+          "lecturer": "Mr. Phéng Oussaphea",
+          "room": "Lab 204 (Building A)",
+          "courseId": "db"
+        }
+      ]
+    },
+    "Saturday": {
+      "dayName": "Saturday",
+      "room": "Room 205 (Building B)",
+      "periods": [
+        {
+          "periodNum": 1,
+          "time": "5:30 PM - 7:00 PM",
+          "subject": "Computer Architecture",
+          "lecturer": "Mr. Chim Bunthoeurn",
+          "room": "Room 205",
+          "courseId": "arch"
+        },
+        {
+          "periodNum": 2,
+          "time": "7:15 PM - 8:30 PM",
+          "subject": "Computer Architecture",
+          "lecturer": "Mr. Chim Bunthoeurn",
+          "room": "Room 205",
+          "courseId": "arch"
+        }
+      ]
+    }
+  }
+}
