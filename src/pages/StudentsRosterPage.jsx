@@ -73,7 +73,7 @@ export default function StudentsRosterPage() {
             <span>Reset Duty</span>
           </button>
           <div className="bg-[#f6f3ea] px-3.5 py-1.5 rounded-xl border border-[#1c1c17] font-['Space_Grotesk'] text-xs font-bold text-[#1c1c17]">
-            Classmates Registered
+            {students.length} Classmates Registered
           </div>
         </div>
       </div>

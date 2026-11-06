@@ -20,6 +20,7 @@ import {
   getWeekDateRange, 
   getDaysForWeek,
   getCurrentClassDay,
+  formatISODate,
   parseDate,
   TOTAL_WEEKS,
   TOTAL_CLASS_DAYS
@@ -35,9 +36,13 @@ const DUTY_ROLES = [
 export default function LiveQueuePage() {
   const { 
     students, 
+    doneStudents,
     currentDate,
     dutyStartDate
   } = useApp();
+
+  // Dynamic cycle number calculation
+  const cycleNumber = Math.max(1, Math.floor(doneStudents.length / (students.length || 30)) + 1);
 
   // Semester & week calculations (dynamically tracks real client time and midnight rollover)
   const today = currentDate || new Date();
@@ -84,7 +89,12 @@ export default function LiveQueuePage() {
   // Duty start date metadata
   const dutyStartDateObj = dutyStartDate ? parseDate(dutyStartDate) : null;
   const dutyStartDayName = dutyStartDateObj ? dutyStartDateObj.toLocaleDateString('en-US', { weekday: 'long' }) : 'Saturday';
-  const dutyStartDateFormatted = dutyStartDateObj ? dutyStartDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Nov 7';
+  const dutyStartDateFormatted = dutyStartDateObj ? dutyStartDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : today.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+  // Saturday info for current week
+  const saturdayInfo = currentWeekDays.find(d => d.dayName === 'Saturday');
+  const saturdayDateText = saturdayInfo ? `Saturday, ${saturdayInfo.dateString}` : 'Saturday';
+  const isFirstDutySaturday = Boolean(dutyStartDate && saturdayInfo?.isoDate === dutyStartDate);
 
   // Handler to change day and smoothly scroll up to the top so names are immediately visible
   const handleSelectDay = (dayName) => {
@@ -95,8 +105,8 @@ export default function LiveQueuePage() {
   // Get the 4 classmates for the selected day based on active duty start date
   let squadStudents = [];
   if (!isSelectedSunday && !isSelectedFriday && !isPreStart) {
-    const start = new Date(dutyStartDate || '2026-11-05');
-    const target = new Date(selectedDayIso || '2026-11-05');
+    const start = new Date(dutyStartDate || formatISODate(today));
+    const target = new Date(selectedDayIso || formatISODate(today));
 
     let dutyDayIndex = 0;
     if (target >= start) {
@@ -137,7 +147,7 @@ export default function LiveQueuePage() {
                   {selectedDayName.toUpperCase()}
                 </span>
                 <span className="font-['Space_Grotesk'] text-xs font-bold text-[#1c1c17]">
-                  {selectedDayInfo?.dateString || 'Nov 5, 2026'}
+                  {selectedDayInfo?.dateString || today.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                 </span>
                 {selectedDayInfo?.isToday && (
                   <span className="bg-[#ffe24c] text-[#211b00] px-2 py-0.5 rounded text-[10px] font-bold border border-[#1c1c17] flex items-center gap-1 animate-pulse">
@@ -218,7 +228,8 @@ export default function LiveQueuePage() {
                 </p>
                 <div className="mt-4 pt-3 border-t border-[#1c1c17]/20 flex flex-col sm:flex-row items-center gap-2.5">
                   <span className="font-['Space_Grotesk'] text-xs font-bold text-[#1c1c17]">
-                    First Projector Duty: <strong>Saturday, Nov 7</strong>
+                    {isFirstDutySaturday ? 'First Projector Duty: ' : 'Next Projector Duty: '}
+                    <strong>{saturdayDateText}</strong>
                   </span>
                   <button
                     type="button"
@@ -547,7 +558,7 @@ export default function LiveQueuePage() {
               </span>
             </div>
             <span className="text-[11px] text-[#62597c] font-semibold">
-              Cycle #1 • Classmates Rotation
+              Cycle #{cycleNumber} • Classmates Rotation
             </span>
           </div>
         </div>

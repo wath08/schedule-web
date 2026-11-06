@@ -55,7 +55,8 @@ export default function Sidebar() {
     { to: '/students', label: 'Classmates Duty List', shortLabel: 'Classmates', icon: Users },
   ];
 
-  const percent = Math.round((doneStudents.length / students.length) * 100);
+  const percent = Math.round((doneStudents.length / (students.length || 30)) * 100);
+  const cycleNumber = Math.max(1, Math.floor(doneStudents.length / (students.length || 30)) + 1);
 
   return (
     <>
@@ -108,7 +109,7 @@ export default function Sidebar() {
                 Duty Progress
               </span>
               <span className="text-[11px] text-[#1b6b4f] bg-[#a6f2cf] px-1.5 py-0.2 rounded border border-[#1c1c17]">
-                Cycle #1
+                Cycle #{cycleNumber}
               </span>
             </div>
             <div className="w-full bg-[#f1eee5] border-2 border-[#1c1c17] h-3.5 rounded-full overflow-hidden mt-2">

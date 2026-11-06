@@ -61,7 +61,7 @@ export default function Navbar() {
               ) : isFriday ? (
                 'Friday (Lab Day • Lab 203 & 204 Building A)'
               ) : activeStudent ? (
-                `${todayDayName} (Active: ${activeStudent.name})`
+                `${todayDayName} (Active Squad • 4 Classmates)`
               ) : (
                 `${todayDayName} (Active Today)`
               )}

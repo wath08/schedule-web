@@ -13,12 +13,15 @@ import {
   Zap
 } from 'lucide-react';
 import timetableData from '../data/timetable.json';
+import { useApp } from '../context/useApp';
 
 export default function ClassTimetablePage() {
+  const { currentDate } = useApp();
+  const today = currentDate || new Date();
   // Today's day name in local time
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  const todayIndex = new Date().getDay();
-  const todayDayName = dayNames[todayIndex]; // e.g. "Thursday"
+  const todayIndex = today.getDay();
+  const todayDayName = dayNames[todayIndex];
 
   // Days list for table
   const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];

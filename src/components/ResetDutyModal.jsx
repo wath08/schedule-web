@@ -4,13 +4,13 @@ import { useApp } from '../context/useApp';
 import { getNextActiveDutyDate } from '../utils/semester';
 
 export default function ResetDutyModal() {
-  const { isResetModalOpen, closeResetModal, restartDutyCycle } = useApp();
+  const { isResetModalOpen, closeResetModal, restartDutyCycle, currentDate } = useApp();
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   if (!isResetModalOpen) return null;
 
-  const dutyTarget = getNextActiveDutyDate(new Date());
+  const dutyTarget = getNextActiveDutyDate(currentDate || new Date());
 
   const handleClose = () => {
     setPassword('');
