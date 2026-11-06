@@ -3,7 +3,6 @@ import { AppProvider } from './context/AppContext';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import Toast from './components/Toast';
-import StudentDetailModal from './components/StudentDetailModal';
 import ResetDutyModal from './components/ResetDutyModal';
 
 // Pages
@@ -40,9 +39,6 @@ export default function App() {
 
           {/* Global Notification Toast */}
           <Toast />
-
-          {/* Student Profile & Presentation Inspection Modal */}
-          <StudentDetailModal />
 
           {/* Reset Duty Password Security Modal */}
           <ResetDutyModal />

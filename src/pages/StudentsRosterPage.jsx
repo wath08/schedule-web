@@ -10,7 +10,7 @@ import {
 import { useApp } from '../context/useApp';
 
 export default function StudentsRosterPage() {
-  const { students, setSelectedStudent, openResetModal } = useApp();
+  const { students, openResetModal } = useApp();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   
@@ -153,8 +153,7 @@ export default function StudentsRosterPage() {
             return (
               <div
                 key={student.id}
-                onClick={() => setSelectedStudent(student)}
-                className="bg-white border-2 border-[#1c1c17] rounded-2xl p-5 shadow-[4px_4px_0px_#1c1c17] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[6px_6px_0px_#1c1c17] transition-all cursor-pointer flex flex-col justify-between"
+                className="bg-white border-2 border-[#1c1c17] rounded-2xl p-5 shadow-[4px_4px_0px_#1c1c17] flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between mb-3">
@@ -200,8 +199,8 @@ export default function StudentsRosterPage() {
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     Duty Slot
                   </span>
-                  <span className="text-[#62597c] font-bold hover:underline">
-                    View Details &gt;
+                  <span className="text-[#62597c] text-[11px] font-semibold">
+                    Room 205
                   </span>
                 </div>
               </div>
@@ -225,8 +224,7 @@ export default function StudentsRosterPage() {
                 {filteredStudents.map(student => (
                   <tr
                     key={student.id}
-                    onClick={() => setSelectedStudent(student)}
-                    className="hover:bg-[#fcf9f0] transition-colors cursor-pointer"
+                    className="hover:bg-[#fcf9f0] transition-colors"
                   >
                     <td className="p-3.5 font-['Space_Grotesk'] font-bold text-xs">
                       <span className="bg-[#1c1c17] text-[#ffe24c] px-2 py-0.5 rounded border border-[#1c1c17]">

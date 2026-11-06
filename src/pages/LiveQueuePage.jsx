@@ -35,7 +35,6 @@ const DUTY_ROLES = [
 export default function LiveQueuePage() {
   const { 
     students, 
-    setSelectedStudent,
     currentDate,
     dutyStartDate
   } = useApp();
@@ -258,9 +257,7 @@ export default function LiveQueuePage() {
               {squadStudents.map((st, idx) => (
                 <div
                   key={st.id}
-                  onClick={() => setSelectedStudent(st)}
-                  className="bg-[#fcf9f0] hover:bg-white border-2 border-[#1c1c17] rounded-xl p-3 sm:p-4 shadow-[3px_3px_0px_#1c1c17] hover:shadow-[5px_5px_0px_#1c1c17] hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all cursor-pointer flex flex-col justify-between"
-                  title="Click to view duty details and mark status"
+                  className="bg-white border-2 border-[#1c1c17] rounded-xl p-3 sm:p-4 shadow-[3px_3px_0px_#1c1c17] flex flex-col justify-between"
                 >
                   <div>
                     {/* Top: Slot & Status */}
@@ -289,7 +286,7 @@ export default function LiveQueuePage() {
                         {st.name.split(' ').map(n => n[0]).join('')}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <h4 className="font-['Space_Grotesk'] font-bold text-base sm:text-lg text-[#1c1c17] truncate leading-tight" title={st.name}>
+                        <h4 className="font-['Space_Grotesk'] font-bold text-base sm:text-lg text-[#1c1c17] truncate leading-tight">
                           {st.name}
                         </h4>
                         <span className="text-xs font-['Plus_Jakarta_Sans'] font-semibold text-[#1b6b4f] block truncate mt-0.5">
@@ -306,10 +303,10 @@ export default function LiveQueuePage() {
                   {/* Card footer */}
                   <div className="mt-2 sm:mt-3 pt-2 border-t border-[#1c1c17]/15 flex items-center justify-between text-xs font-['Space_Grotesk']">
                     <span className="text-[#62597c] text-[11px] font-semibold">
-                      Room 205
+                      Room 205 (Building B)
                     </span>
-                    <span className="text-[#1c1c17] font-bold hover:underline flex items-center gap-0.5 text-xs">
-                      Details →
+                    <span className="text-[11px] font-bold text-[#1b6b4f]">
+                      Assigned
                     </span>
                   </div>
                 </div>
