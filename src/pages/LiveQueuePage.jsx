@@ -20,6 +20,7 @@ import {
   getWeekDateRange, 
   getDaysForWeek,
   getCurrentClassDay,
+  parseDate,
   TOTAL_WEEKS,
   TOTAL_CLASS_DAYS
 } from '../utils/semester';
@@ -80,6 +81,11 @@ export default function LiveQueuePage() {
   const isSelectedFriday = selectedDayName === 'Friday';
   const selectedDayIso = selectedDayInfo?.isoDate;
   const isPreStart = Boolean(dutyStartDate && selectedDayIso && selectedDayIso < dutyStartDate);
+
+  // Duty start date metadata
+  const dutyStartDateObj = dutyStartDate ? parseDate(dutyStartDate) : null;
+  const dutyStartDayName = dutyStartDateObj ? dutyStartDateObj.toLocaleDateString('en-US', { weekday: 'long' }) : 'Saturday';
+  const dutyStartDateFormatted = dutyStartDateObj ? dutyStartDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Nov 7';
 
   // Handler to change day and smoothly scroll up to the top so names are immediately visible
   const handleSelectDay = (dayName) => {
@@ -148,7 +154,7 @@ export default function LiveQueuePage() {
                   : isSelectedFriday
                   ? 'Friday Computer Lab Day'
                   : isPreStart
-                  ? `${selectedDayName} (Pre-start Day)`
+                  ? `${selectedDayName} (Before Duty Start)`
                   : `${selectedDayName} Projector Duty Squad (4 Classmates)`}
               </h2>
               <p className="font-['Plus_Jakarta_Sans'] text-xs sm:text-sm text-[#48454d] mt-0.5">
@@ -157,7 +163,7 @@ export default function LiveQueuePage() {
                   : isSelectedFriday
                   ? 'Classes meet in Lab 203 & 204 Building A. No projector duty needed!'
                   : isPreStart
-                  ? 'This day occurred before the start of the current duty cycle.'
+                  ? `This day occurred before the active duty rotation. The cycle begins on ${dutyStartDayName} (${dutyStartDateFormatted}) with Slot #01 (Sokha Mean & Squad).`
                   : 'Responsible for bringing the projector, setting up power cables in Room 205, and returning equipment after lecture.'
                 }
               </p>
@@ -211,20 +217,40 @@ export default function LiveQueuePage() {
                 <p className="font-['Space_Grotesk'] text-sm sm:text-lg font-bold text-[#004a77] uppercase tracking-wide">
                   Lab 203 & 204 Building A
                 </p>
+                <div className="mt-4 pt-3 border-t border-[#1c1c17]/20 flex flex-col sm:flex-row items-center gap-2.5">
+                  <span className="font-['Space_Grotesk'] text-xs font-bold text-[#1c1c17]">
+                    First Projector Duty: <strong>Saturday, Nov 7</strong> (Slot #01 Sokha Mean & Squad)
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handleSelectDay('Saturday')}
+                    className="bg-[#ffe24c] hover:bg-yellow-300 text-[#1c1c17] px-3 py-1 rounded-xl border border-[#1c1c17] font-['Space_Grotesk'] text-xs font-bold shadow-[2px_2px_0px_#1c1c17] active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer"
+                  >
+                    View Saturday Squad (#01–#04) →
+                  </button>
+                </div>
               </div>
             </div>
           ) : isPreStart ? (
             /* Pre-start Day: Duty cycle started later */
-            <div className="bg-[#fcf9f0] border-2 border-[#1c1c17] rounded-2xl p-6 sm:p-8 shadow-[3px_3px_0px_#1c1c17] flex flex-col items-center justify-center text-center gap-2">
+            <div className="bg-[#fcf9f0] border-2 border-[#1c1c17] rounded-2xl p-6 sm:p-8 shadow-[3px_3px_0px_#1c1c17] flex flex-col items-center justify-center text-center gap-2.5">
               <span className="font-['Space_Grotesk'] text-xs font-bold uppercase px-3 py-1 rounded-full border border-[#1c1c17] bg-[#f1eee5] text-[#48454d]">
-                Pre-start Day
+                Pre-cycle Day
               </span>
               <h3 className="font-['Space_Grotesk'] text-lg sm:text-xl font-bold text-[#1c1c17] mt-1">
-                Duty Cycle Started Today ({todayDayName})
+                Duty Cycle Starts on {dutyStartDayName} ({dutyStartDateFormatted})
               </h3>
-              <p className="font-['Plus_Jakarta_Sans'] text-xs sm:text-sm text-[#48454d] max-w-md">
-                No projector duties were scheduled for this day in the current rotation. Select Today ({todayDayName}) to view active classmates.
+              <p className="font-['Plus_Jakarta_Sans'] text-xs sm:text-sm text-[#48454d] max-w-md leading-relaxed">
+                No projector duties were scheduled for this day in the current rotation. The duty cycle officially begins on <strong>{dutyStartDayName} with Slot #01 (Sokha Mean & Squad)</strong>.
               </p>
+              <button
+                type="button"
+                onClick={() => handleSelectDay(dutyStartDayName)}
+                className="mt-2 bg-[#ffe24c] hover:bg-yellow-300 text-[#1c1c17] px-4 py-2 rounded-xl border-2 border-[#1c1c17] font-['Space_Grotesk'] text-xs font-bold shadow-[2px_2px_0px_#1c1c17] active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer flex items-center gap-1.5"
+              >
+                <span>View First Duty Squad ({dutyStartDayName} • Slot #01)</span>
+                <span>→</span>
+              </button>
             </div>
           ) : (
             /* 4 Classmate Cards for Normal Class Days */
