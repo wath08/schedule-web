@@ -128,12 +128,12 @@ export default function ChromaKeyCatMeme() {
           {isMuted ? (
             <>
               <VolumeX className="w-4 h-4 text-[#ba1a1a]" />
-              <span>🔊 TAP FOR MEME SOUND!</span>
+              <span>TAP FOR MEME SOUND!</span>
             </>
           ) : (
             <>
               <Volume2 className="w-4 h-4 text-[#002115] animate-pulse" />
-              <span>🔊 SOUND PLAYING • MUTE</span>
+              <span> SOUND PLAYING • MUTE</span>
             </>
           )}
         </button>

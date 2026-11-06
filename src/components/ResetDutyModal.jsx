@@ -17,9 +17,8 @@ export default function ResetDutyModal() {
 
   const handleSign = (e) => {
     e.preventDefault();
-    const trimmed = password.trim().toLowerCase();
-    // Accepted passwords: e2gen29, 1234, rupp, admin
-    if (['e2gen29', '1234', 'rupp', 'admin'].includes(trimmed)) {
+    const trimmed = password.trim();
+    if (trimmed === '240807') {
       restartDutyCycle();
       handleClose();
     } else {
@@ -78,7 +77,7 @@ export default function ResetDutyModal() {
                   setPassword(e.target.value);
                   if (error) setError('');
                 }}
-                placeholder="Enter password (e.g. e2gen29 or 1234)..."
+                placeholder="Enter password..."
                 className="w-full bg-white border-2 border-[#1c1c17] rounded-xl pl-9 pr-3 py-2 text-sm font-['Space_Grotesk'] font-bold text-[#1c1c17] placeholder-[#48454d] focus:outline-none focus:ring-2 focus:ring-[#ffe24c] shadow-[2px_2px_0px_#1c1c17]"
               />
               <Lock className="w-4 h-4 text-[#48454d] absolute left-3 top-1/2 -translate-y-1/2" />
@@ -90,10 +89,7 @@ export default function ResetDutyModal() {
                 {error}
               </p>
             )}
-
-            <p className="font-['Space_Grotesk'] text-[11px] text-[#62597c] font-semibold mt-1">
-              Hint: Default password is <code className="bg-white px-1.5 py-0.5 rounded border border-[#1c1c17]/30 font-bold text-[#1c1c17]">e2gen29</code> or <code className="bg-white px-1.5 py-0.5 rounded border border-[#1c1c17]/30 font-bold text-[#1c1c17]">1234</code>
-            </p>
+            
           </div>
 
           {/* Action Buttons: Sign and Cancel */}
