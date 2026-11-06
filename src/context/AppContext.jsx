@@ -1,17 +1,25 @@
 import { useState, useEffect } from 'react';
 import initialStudents from '../data/students.json';
 import { AppContext } from './context';
+import { getNextActiveDutyDate } from '../utils/semester';
 
-function enrichStudent(s) {
+function enrichStudent(s, isDutyDay = true) {
   const slotNumber = '#' + String(s.id).padStart(2, '0');
   const avatarColors = ['#a6f2cf', '#e0d4fd', '#ffe24c', '#ffdad6', '#cbe6ff', '#e2e3dd'];
   const avatarBg = avatarColors[(s.id - 1) % avatarColors.length];
   
-  // Clean start from current day with fresh classmates:
-  // Slots #01 - #04 are Active Today (Thursday Nov 5)
+  // If today is an active projector duty day (Mon, Tue, Wed, Thu, Sat):
+  // Slots #01 - #04 are Active Today
   // Slots #05 - #08 are Up Next Tomorrow
   // Slots #09 - #30 are In Queue
-  const defaultStatus = s.id <= 4 ? 'active' : s.id <= 8 ? 'tomorrow' : 'waiting';
+  //
+  // If today has NO projector duty (Friday Computer Lab Day or Sunday Rest Day):
+  // Zero students are on duty today!
+  // Slots #01 - #04 are Up Next for the next session (Saturday or Monday)
+  // Slots #05 - #30 are In Queue
+  const defaultStatus = isDutyDay
+    ? (s.id <= 4 ? 'active' : s.id <= 8 ? 'tomorrow' : 'waiting')
+    : (s.id <= 4 ? 'tomorrow' : 'waiting');
   
   return {
     ...s,
@@ -49,13 +57,17 @@ export function AppProvider({ children }) {
     return () => clearInterval(timer);
   }, []);
 
-  // Duty cycle start date anchor (defaults to current date '2026-11-05')
+  // Duty cycle start date anchor (skips Friday/Sunday to Saturday/Monday)
   const [dutyStartDate, setDutyStartDate] = useState(() => {
-    return localStorage.getItem('projector_duty_start_date') || '2026-11-05';
+    const saved = localStorage.getItem('projector_duty_start_date');
+    if (saved) return saved;
+    return getNextActiveDutyDate(new Date()).isoDate;
   });
 
   const [students, setStudents] = useState(() => {
-    const base = initialStudents.map(enrichStudent);
+    const dow = (new Date()).getDay();
+    const isDutyDay = dow !== 5 && dow !== 0;
+    const base = initialStudents.map(s => enrichStudent(s, isDutyDay));
     const saved = localStorage.getItem('projector_duty_students_v7');
     if (saved) {
       try {
@@ -95,14 +107,33 @@ export function AppProvider({ children }) {
   const closeResetModal = () => setIsResetModalOpen(false);
 
   const restartDutyCycle = () => {
-    const todayIso = (currentDate || new Date()).toISOString().split('T')[0];
-    setDutyStartDate(todayIso);
-    localStorage.setItem('projector_duty_start_date', todayIso);
+    const now = currentDate || new Date();
+    const { isoDate, isFriday, isSunday } = getNextActiveDutyDate(now);
 
-    const freshStudents = initialStudents.map(enrichStudent);
+    setDutyStartDate(isoDate);
+    localStorage.setItem('projector_duty_start_date', isoDate);
+
+    const isDutyDay = !isFriday && !isSunday;
+    const freshStudents = initialStudents.map(s => enrichStudent(s, isDutyDay));
     setStudents(freshStudents);
     localStorage.setItem('projector_duty_students_v7', JSON.stringify(freshStudents));
-    showToast("Duty cycle restarted starting today with fresh classmates!", "success");
+
+    if (isFriday) {
+      showToast(
+        "Duty cycle reset! Friday is Lab Day (no projector needed) — rotation begins Saturday with Slot #01!",
+        "success"
+      );
+    } else if (isSunday) {
+      showToast(
+        "Duty cycle reset! Sunday is Rest Day — rotation begins Monday with Slot #01!",
+        "success"
+      );
+    } else {
+      showToast(
+        "Duty cycle restarted starting today with fresh classmates (Slot #01–#04)!",
+        "success"
+      );
+    }
   };
 
   const markDelivered = (studentId) => {

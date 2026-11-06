@@ -19,6 +19,7 @@ import {
   getWeekNumber, 
   getWeekDateRange, 
   getDaysForWeek,
+  getCurrentClassDay,
   TOTAL_WEEKS,
   TOTAL_CLASS_DAYS
 } from '../utils/semester';
@@ -499,7 +500,7 @@ export default function LiveQueuePage() {
             <div className="flex items-center gap-2">
               <span>Duty Progress:</span>
               <span className="bg-[#a6f2cf] text-[#002115] px-2.5 py-0.5 rounded-lg border border-[#1c1c17]">
-                Day 10 / {TOTAL_CLASS_DAYS} (Week {currentWeekNum} of {TOTAL_WEEKS})
+                Day {getCurrentClassDay(today)} / {TOTAL_CLASS_DAYS} (Week {currentWeekNum} of {TOTAL_WEEKS})
               </span>
             </div>
             <span className="text-[11px] text-[#62597c] font-semibold">

@@ -174,6 +174,58 @@ export function getInfoForDate(targetDate, studentsList = []) {
   };
 }
 
+// Calculate dynamic global class day index (1 to 108) across the 18 weeks (6 days/week: Mon-Sat)
+export function getCurrentClassDay(date = new Date()) {
+  const d = date instanceof Date ? date : parseDate(date);
+  const weekNum = getWeekNumber(d);
+  const dow = d.getDay(); // 0 is Sun, 1 is Mon, 6 is Sat
+  if (dow === 0) {
+    // Sunday (rest day) -> return completed class days up to Saturday of this week
+    return Math.min(Math.max((weekNum - 1) * CLASS_DAYS_PER_WEEK + 6, 1), TOTAL_CLASS_DAYS);
+  }
+  const dayIndex = dow - 1; // 0 for Mon, 5 for Sat
+  const classDay = (weekNum - 1) * CLASS_DAYS_PER_WEEK + dayIndex + 1;
+  return Math.min(Math.max(classDay, 1), TOTAL_CLASS_DAYS);
+}
+
+// Calculate next active projector duty date (Friday skips to Saturday, Sunday skips to Monday)
+export function getNextActiveDutyDate(date = new Date()) {
+  const d = date instanceof Date ? new Date(date) : parseDate(date);
+  const dow = d.getDay(); // 0 Sun, 1 Mon, 5 Fri, 6 Sat
+
+  if (dow === 5) {
+    // Friday (Computer Lab Day - no projector needed) -> next duty day is Saturday (+1 day)
+    const next = new Date(d);
+    next.setDate(d.getDate() + 1);
+    return {
+      nextDate: next,
+      isoDate: formatISODate(next),
+      isFriday: true,
+      isSunday: false,
+      targetDayName: 'Saturday'
+    };
+  } else if (dow === 0) {
+    // Sunday (Weekly Rest Day - no duty) -> next duty day is Monday (+1 day)
+    const next = new Date(d);
+    next.setDate(d.getDate() + 1);
+    return {
+      nextDate: next,
+      isoDate: formatISODate(next),
+      isFriday: false,
+      isSunday: true,
+      targetDayName: 'Monday'
+    };
+  }
+
+  return {
+    nextDate: d,
+    isoDate: formatISODate(d),
+    isFriday: false,
+    isSunday: false,
+    targetDayName: d.toLocaleDateString('en-US', { weekday: 'long' })
+  };
+}
+
 // Get all duty dates across all 18 weeks for a specific student ID (1 - 30)
 export function getStudentDutyDates(studentId) {
   const duties = [];

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Lock, X, RotateCcw, AlertCircle } from 'lucide-react';
 import { useApp } from '../context/useApp';
+import { getNextActiveDutyDate } from '../utils/semester';
 
 export default function ResetDutyModal() {
   const { isResetModalOpen, closeResetModal, restartDutyCycle } = useApp();
@@ -8,6 +9,8 @@ export default function ResetDutyModal() {
   const [error, setError] = useState('');
 
   if (!isResetModalOpen) return null;
+
+  const dutyTarget = getNextActiveDutyDate(new Date());
 
   const handleClose = () => {
     setPassword('');
@@ -61,7 +64,19 @@ export default function ResetDutyModal() {
         {/* Modal Body */}
         <form onSubmit={handleSign} className="flex flex-col gap-4">
           <p className="font-['Plus_Jakarta_Sans'] text-xs sm:text-sm text-[#48454d] leading-relaxed">
-            Restart duty rotation starting <strong>today with fresh classmates</strong> (Slot #01 Sokha Mean & Squad). Please enter the admin password to confirm.
+            {dutyTarget.isFriday ? (
+              <>
+                Today is <strong>Friday Computer Lab Day</strong> (Lab 203 & 204 Building A) — zero projector duty needed today. Resetting will cleanly begin duty on <strong>Saturday with Slot #01</strong> (Sokha Mean & Squad). Please enter admin password to confirm.
+              </>
+            ) : dutyTarget.isSunday ? (
+              <>
+                Today is <strong>Sunday Weekly Rest Day</strong> — zero projector duty. Resetting will cleanly begin duty on <strong>Monday with Slot #01</strong> (Sokha Mean & Squad). Please enter admin password to confirm.
+              </>
+            ) : (
+              <>
+                Restart duty rotation starting <strong>today with fresh classmates</strong> (Slot #01 Sokha Mean & Squad). Please enter the admin password to confirm.
+              </>
+            )}
           </p>
 
           <div className="flex flex-col gap-1.5">
