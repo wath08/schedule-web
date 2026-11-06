@@ -66,15 +66,15 @@ export default function ResetDutyModal() {
           <p className="font-['Plus_Jakarta_Sans'] text-xs sm:text-sm text-[#48454d] leading-relaxed">
             {dutyTarget.isFriday ? (
               <>
-                Today is <strong>Friday Computer Lab Day</strong> (Lab 203 & 204 Building A) — zero projector duty needed today. Resetting will cleanly begin duty on <strong>Saturday with Slot #01</strong> (Sokha Mean & Squad). Please enter admin password to confirm.
+                Today is <strong>Friday Computer Lab Day</strong> (Lab 203 & 204 Building A) — zero projector duty needed today. Resetting will cleanly begin duty on <strong>Saturday with Slot #01</strong>. Please enter admin password to confirm.
               </>
             ) : dutyTarget.isSunday ? (
               <>
-                Today is <strong>Sunday Weekly Rest Day</strong> — zero projector duty. Resetting will cleanly begin duty on <strong>Monday with Slot #01</strong> (Sokha Mean & Squad). Please enter admin password to confirm.
+                Today is <strong>Sunday Weekly Rest Day</strong> — zero projector duty. Resetting will cleanly begin duty on <strong>Monday with Slot #01</strong>. Please enter admin password to confirm.
               </>
             ) : (
               <>
-                Restart duty rotation starting <strong>today with fresh classmates</strong> (Slot #01 Sokha Mean & Squad). Please enter the admin password to confirm.
+                Restart duty rotation starting <strong>today with fresh classmates</strong>. Please enter the admin password to confirm.
               </>
             )}
           </p>

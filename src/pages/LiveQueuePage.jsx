@@ -163,7 +163,7 @@ export default function LiveQueuePage() {
                   : isSelectedFriday
                   ? 'Classes meet in Lab 203 & 204 Building A. No projector duty needed!'
                   : isPreStart
-                  ? `This day occurred before the active duty rotation. The cycle begins on ${dutyStartDayName} (${dutyStartDateFormatted}) with Slot #01 (Sokha Mean & Squad).`
+                  ? 'This day occurred before the start of the current duty cycle.'
                   : 'Responsible for bringing the projector, setting up power cables in Room 205, and returning equipment after lecture.'
                 }
               </p>
@@ -219,14 +219,14 @@ export default function LiveQueuePage() {
                 </p>
                 <div className="mt-4 pt-3 border-t border-[#1c1c17]/20 flex flex-col sm:flex-row items-center gap-2.5">
                   <span className="font-['Space_Grotesk'] text-xs font-bold text-[#1c1c17]">
-                    First Projector Duty: <strong>Saturday, Nov 7</strong> (Slot #01 Sokha Mean & Squad)
+                    First Projector Duty: <strong>Saturday, Nov 7</strong>
                   </span>
                   <button
                     type="button"
                     onClick={() => handleSelectDay('Saturday')}
                     className="bg-[#ffe24c] hover:bg-yellow-300 text-[#1c1c17] px-3 py-1 rounded-xl border border-[#1c1c17] font-['Space_Grotesk'] text-xs font-bold shadow-[2px_2px_0px_#1c1c17] active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer"
                   >
-                    View Saturday Squad (#01–#04) →
+                    View Saturday Squad →
                   </button>
                 </div>
               </div>
@@ -241,14 +241,14 @@ export default function LiveQueuePage() {
                 Duty Cycle Starts on {dutyStartDayName} ({dutyStartDateFormatted})
               </h3>
               <p className="font-['Plus_Jakarta_Sans'] text-xs sm:text-sm text-[#48454d] max-w-md leading-relaxed">
-                No projector duties were scheduled for this day in the current rotation. The duty cycle officially begins on <strong>{dutyStartDayName} with Slot #01 (Sokha Mean & Squad)</strong>.
+                No projector duties were scheduled for this day in the current rotation.
               </p>
               <button
                 type="button"
                 onClick={() => handleSelectDay(dutyStartDayName)}
                 className="mt-2 bg-[#ffe24c] hover:bg-yellow-300 text-[#1c1c17] px-4 py-2 rounded-xl border-2 border-[#1c1c17] font-['Space_Grotesk'] text-xs font-bold shadow-[2px_2px_0px_#1c1c17] active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer flex items-center gap-1.5"
               >
-                <span>View First Duty Squad ({dutyStartDayName} • Slot #01)</span>
+                <span>View First Duty Squad ({dutyStartDayName})</span>
                 <span>→</span>
               </button>
             </div>
