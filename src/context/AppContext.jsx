@@ -36,45 +36,56 @@ export function AppProvider({ children }) {
   // Clear legacy stored states so users get the fresh synchronized state
   useEffect(() => {
     try {
+      localStorage.removeItem('projector_duty_students_v9');
+      localStorage.removeItem('projector_duty_students_v8');
+      localStorage.removeItem('projector_duty_students_v7');
       localStorage.removeItem('projector_duty_students_v6');
       localStorage.removeItem('projector_duty_students_v5');
       localStorage.removeItem('projector_duty_students_v4');
       localStorage.removeItem('projector_duty_students_v3');
       localStorage.removeItem('projector_duty_students_v2');
       localStorage.removeItem('projector_duty_students');
+      localStorage.removeItem('projector_duty_start_date');
+      localStorage.removeItem('projector_duty_start_date_v2');
+      localStorage.removeItem('projector_duty_start_date_v3');
     } catch {
       // ignore
     }
   }, []);
 
-  // Dynamic live clock: checks every 10 seconds to ensure seamless midnight rollover
-  const [currentDate, setCurrentDate] = useState(() => new Date());
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentDate(new Date());
-    }, 10000);
-    return () => clearInterval(timer);
-  }, []);
-
   // Duty cycle start date anchor (skips Friday/Sunday to Saturday/Monday)
   const [dutyStartDate, setDutyStartDate] = useState(() => {
-    const saved = localStorage.getItem('projector_duty_start_date');
-    if (saved) return saved;
-    return getNextActiveDutyDate(new Date()).isoDate;
+    const now = new Date();
+    const dow = now.getDay();
+    const nextActive = getNextActiveDutyDate(now);
+    const saved = localStorage.getItem('projector_duty_start_date_v4');
+    if (saved) {
+      // If today is Friday or Sunday, ensure duty start date doesn't linger on a past duty day
+      if ((dow === 5 || dow === 0) && saved < nextActive.isoDate) {
+        return nextActive.isoDate;
+      }
+      return saved;
+    }
+    return nextActive.isoDate;
   });
 
   const [students, setStudents] = useState(() => {
     const dow = (new Date()).getDay();
     const isDutyDay = dow !== 5 && dow !== 0;
     const base = initialStudents.map(s => enrichStudent(s, isDutyDay));
-    const saved = localStorage.getItem('projector_duty_students_v7');
+    const saved = localStorage.getItem('projector_duty_students_v10');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
         return base.map(init => {
           const found = parsed.find(p => p.id === init.id);
-          return found ? { ...init, status: found.status, returned: found.returned, returnedStatus: found.returnedStatus } : init;
+          if (!found) return init;
+          // CRITICAL: On Friday (Lab Day) and Sunday (Rest Day), ZERO students are on duty today
+          let status = found.status;
+          if (!isDutyDay && status === 'active') {
+            status = 'tomorrow';
+          }
+          return { ...init, status, returned: found.returned, returnedStatus: found.returnedStatus };
         });
       } catch {
         return base;
@@ -83,17 +94,45 @@ export function AppProvider({ children }) {
     return base;
   });
 
+  // Dynamic live clock: checks every 10 seconds to ensure seamless midnight rollover
+  const [currentDate, setCurrentDate] = useState(() => new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const now = new Date();
+      setCurrentDate(now);
+
+      const dow = now.getDay();
+      const isDutyDay = dow !== 5 && dow !== 0;
+      if (!isDutyDay) {
+        setStudents(prev => {
+          const hasActive = prev.some(s => s.status === 'active');
+          if (!hasActive) return prev;
+          return prev.map(s => s.status === 'active' ? { ...s, status: 'tomorrow' } : s);
+        });
+        const nextActive = getNextActiveDutyDate(now);
+        setDutyStartDate(prev => {
+          if (!prev || prev < nextActive.isoDate) {
+            return nextActive.isoDate;
+          }
+          return prev;
+        });
+      }
+    }, 10000);
+    return () => clearInterval(timer);
+  }, []);
+
   const [toast, setToast] = useState({ show: false, message: '', type: 'info' });
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
 
   // Sync with localStorage
   useEffect(() => {
-    localStorage.setItem('projector_duty_students_v7', JSON.stringify(students));
+    localStorage.setItem('projector_duty_students_v10', JSON.stringify(students));
   }, [students]);
 
   useEffect(() => {
-    localStorage.setItem('projector_duty_start_date', dutyStartDate);
+    localStorage.setItem('projector_duty_start_date_v4', dutyStartDate);
   }, [dutyStartDate]);
 
   const showToast = (message, type = 'info') => {
@@ -111,12 +150,12 @@ export function AppProvider({ children }) {
     const { isoDate, isFriday, isSunday } = getNextActiveDutyDate(now);
 
     setDutyStartDate(isoDate);
-    localStorage.setItem('projector_duty_start_date', isoDate);
+    localStorage.setItem('projector_duty_start_date_v4', isoDate);
 
     const isDutyDay = !isFriday && !isSunday;
     const freshStudents = initialStudents.map(s => enrichStudent(s, isDutyDay));
     setStudents(freshStudents);
-    localStorage.setItem('projector_duty_students_v7', JSON.stringify(freshStudents));
+    localStorage.setItem('projector_duty_students_v10', JSON.stringify(freshStudents));
 
     if (isFriday) {
       showToast(
