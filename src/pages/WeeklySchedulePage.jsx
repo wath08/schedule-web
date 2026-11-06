@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   CalendarDays, 
@@ -32,6 +32,15 @@ export default function WeeklySchedulePage() {
   // Default to dynamic current week
   const currentWeekNum = getWeekNumber(now);
   const [selectedWeek, setSelectedWeek] = useState(currentWeekNum);
+  
+  // Auto-sync selected week when live clock crosses into a new week
+  const prevWeekRef = useRef(currentWeekNum);
+  useEffect(() => {
+    if (prevWeekRef.current !== currentWeekNum) {
+      setSelectedWeek(currentWeekNum);
+      prevWeekRef.current = currentWeekNum;
+    }
+  }, [currentWeekNum]);
   
   // Date finder state
   const [searchDate, setSearchDate] = useState(formatISODate(now));
@@ -84,24 +93,23 @@ export default function WeeklySchedulePage() {
         </div>
 
         {/* Action & Date Badges */}
-        <div className="flex flex-wrap items-center gap-3">
-          <Link
-            to="/timetable"
-            className="flex items-center gap-1.5 bg-[#ffe24c] hover:bg-yellow-300 text-[#1c1c17] px-3.5 py-2 rounded-xl border-2 border-[#1c1c17] font-['Space_Grotesk'] text-xs font-bold shadow-[2px_2px_0px_#1c1c17] transition-all"
-          >
-            <BookOpen className="w-4 h-4 text-[#1c1c17]" />
-            <span>Master Timetable & Lecturers →</span>
-          </Link>
-
-          <div className="flex items-center gap-2 bg-[#f6f3ea] p-2.5 rounded-xl border border-[#1c1c17]">
-            <Clock className="w-4 h-4 text-[#ba1a1a]" />
-            <div className="text-left font-['Space_Grotesk']">
-              <p className="text-[10px] uppercase font-bold text-[#48454d]">Current Status</p>
-              <p className="text-xs font-bold text-[#1c1c17]">
-                Today: {now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: '2-digit', year: 'numeric' })} • <span className="text-[#ba1a1a]">Week {currentWeekNum}</span>
-              </p>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2.5">
+          <div className="flex items-center gap-2 bg-[#f6f3ea] px-3.5 py-2 rounded-xl border-2 border-[#1c1c17] shadow-[2px_2px_0px_#1c1c17]">
+            <Clock className="w-4 h-4 text-[#ba1a1a] shrink-0" />
+            <div className="font-['Space_Grotesk'] text-xs font-bold text-[#1c1c17] flex items-center gap-1.5 flex-wrap">
+              <span>Today: {now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: '2-digit', year: 'numeric' })}</span>
+              <span className="text-[#cac4ce]">|</span>
+              <span className="text-[#ba1a1a]">Week {currentWeekNum}</span>
             </div>
           </div>
+
+          <Link
+            to="/timetable"
+            className="inline-flex items-center justify-center gap-1.5 bg-[#ffe24c] hover:bg-yellow-300 text-[#1c1c17] px-3.5 py-2 rounded-xl border-2 border-[#1c1c17] font-['Space_Grotesk'] text-xs font-bold shadow-[2px_2px_0px_#1c1c17] active:translate-x-[1px] active:translate-y-[1px] transition-all"
+          >
+            <BookOpen className="w-4 h-4 text-[#1c1c17]" />
+            <span>Master Timetable →</span>
+          </Link>
         </div>
       </div>
 
