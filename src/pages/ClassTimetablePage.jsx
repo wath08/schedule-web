@@ -1,3 +1,4 @@
+import { useRef, useEffect } from 'react';
 import { 
   Calendar, 
   Clock, 
@@ -21,6 +22,22 @@ export default function ClassTimetablePage() {
 
   // Days list for table
   const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+  // Auto-scroll table on mobile so today's schedule is immediately visible
+  const tableContainerRef = useRef(null);
+  const todayHeaderRef = useRef(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const container = tableContainerRef.current;
+      const header = todayHeaderRef.current;
+      if (container && header) {
+        const scrollPos = header.offsetLeft - (container.clientWidth / 2) + (header.clientWidth / 2);
+        container.scrollTo({ left: Math.max(0, scrollPos), behavior: 'smooth' });
+      }
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [todayDayName]);
 
   return (
     <div className="flex flex-col gap-8 pb-16">
@@ -133,7 +150,7 @@ export default function ClassTimetablePage() {
         </div>
 
         {/* Scrollable Responsive Table */}
-        <div className="overflow-x-auto pb-2">
+        <div ref={tableContainerRef} className="overflow-x-auto pb-2 scroll-smooth">
           <table className="w-full min-w-[760px] border-collapse border-2 border-[#1c1c17] font-['Space_Grotesk'] text-xs">
             {/* Table Header: Days of the week */}
             <thead>
@@ -146,6 +163,7 @@ export default function ClassTimetablePage() {
                   return (
                     <th 
                       key={day}
+                      ref={isToday ? todayHeaderRef : null}
                       className={`border-2 border-[#1c1c17] p-2.5 text-center transition-all ${
                         isToday ? 'bg-[#ffe24c] text-[#1c1c17]' : 'bg-[#1c1c17] text-white'
                       }`}

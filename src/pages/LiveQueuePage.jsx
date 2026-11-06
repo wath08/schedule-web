@@ -49,6 +49,22 @@ export default function LiveQueuePage() {
   const todayDayName = today.toLocaleDateString('en-US', { weekday: 'long' });
   const [selectedDayName, setSelectedDayName] = useState(todayDayName);
 
+  // Auto-scroll 7-day schedule strip on mobile to center today/selected day card
+  const stripContainerRef = useRef(null);
+  const activeDayCardRef = useRef(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const container = stripContainerRef.current;
+      const card = activeDayCardRef.current;
+      if (container && card) {
+        const scrollPos = card.offsetLeft - (container.clientWidth / 2) + (card.clientWidth / 2);
+        container.scrollTo({ left: Math.max(0, scrollPos), behavior: 'smooth' });
+      }
+    }, 120);
+    return () => clearTimeout(timer);
+  }, [selectedDayName]);
+
   // Auto-switch to next day when midnight passes (e.g. from Thursday to Friday at 12:00 AM)
   const prevTodayRef = useRef(todayDayName);
   useEffect(() => {
@@ -316,7 +332,10 @@ export default function LiveQueuePage() {
         </div>
 
         {/* Clean 7-Day Clickable Bar: horizontal scrollable on phone, 7-col grid on tablet/desktop */}
-        <div className="flex sm:grid sm:grid-cols-7 overflow-x-auto no-scrollbar gap-2 sm:gap-3 pb-2 pt-1">
+        <div 
+          ref={stripContainerRef}
+          className="flex sm:grid sm:grid-cols-7 overflow-x-auto no-scrollbar gap-2 sm:gap-3 pb-2 pt-1 scroll-smooth"
+        >
           {currentWeekDays.map((day) => {
             const isSelected = selectedDayName === day.dayName;
             const isSunday = day.isOffDay;
@@ -330,6 +349,7 @@ export default function LiveQueuePage() {
             return (
               <button
                 key={day.dayName}
+                ref={isSelected ? activeDayCardRef : null}
                 onClick={() => handleSelectDay(day.dayName)}
                 type="button"
                 className={`p-3 rounded-2xl border-2 border-[#1c1c17] flex flex-col justify-between text-left transition-all cursor-pointer min-w-[105px] sm:min-w-0 flex-1 shrink-0 min-h-[115px] ${
