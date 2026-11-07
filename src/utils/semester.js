@@ -259,4 +259,110 @@ export function getStudentDutyDates(studentId) {
   return duties;
 }
 
+// Dynamically calculate student statuses in real-time based on referenceDate and dutyStartDate
+export function calculateDynamicRoster(referenceDate = new Date(), dutyStartDate, initialList = []) {
+  const d = referenceDate instanceof Date ? referenceDate : parseDate(referenceDate);
+  const refIso = formatISODate(d);
+  const refDow = d.getDay(); // 0: Sun, 1: Mon, ..., 5: Fri, 6: Sat
+
+  const isTodayDutyDay = refDow === 1 || refDow === 2 || refDow === 3 || refDow === 4 || refDow === 6;
+  const startDateStr = dutyStartDate || '2026-11-07';
+  const startDate = parseDate(startDateStr);
+
+  const avatarColors = ['#a6f2cf', '#e0d4fd', '#ffe24c', '#ffdad6', '#cbe6ff', '#e2e3dd'];
+
+  // If before duty start date (Pre-cycle)
+  if (refIso < startDateStr) {
+    return initialList.map(s => ({
+      ...s,
+      slotNumber: s.slotNumber || ('#' + String(s.id).padStart(2, '0')),
+      status: s.id <= 4 ? 'tomorrow' : 'waiting',
+      returned: false,
+      room: s.room || 'Room 205 (Building B)',
+      duty: s.duty || 'Prepare projector & clean whiteboard',
+      avatarBg: s.avatarBg || avatarColors[(s.id - 1) % avatarColors.length]
+    }));
+  }
+
+  // Count active duty days occurred strictly before reference date
+  let dutyDaysBeforeToday = 0;
+  const temp = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+  const endTarget = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+  while (temp < endTarget) {
+    const dow = temp.getDay();
+    if (dow === 1 || dow === 2 || dow === 3 || dow === 4 || dow === 6) {
+      dutyDaysBeforeToday++;
+    }
+    temp.setDate(temp.getDate() + 1);
+  }
+
+  let activeIds = new Set();
+  let tomorrowIds = new Set();
+  const completedCount = dutyDaysBeforeToday * 4;
+
+  if (isTodayDutyDay) {
+    // Mon, Tue, Wed, Thu, Sat: 4 students are active today
+    const todayDutyIndex = dutyDaysBeforeToday;
+    const todayBaseSlot = (todayDutyIndex * 4) % 30 + 1;
+    activeIds = new Set([
+      todayBaseSlot,
+      (todayBaseSlot % 30) + 1,
+      ((todayBaseSlot + 1) % 30) + 1,
+      ((todayBaseSlot + 2) % 30) + 1
+    ]);
+
+    // Next duty day (Tomorrow or Monday if today is Saturday)
+    const nextDutyIndex = todayDutyIndex + 1;
+    const nextBaseSlot = (nextDutyIndex * 4) % 30 + 1;
+    tomorrowIds = new Set([
+      nextBaseSlot,
+      (nextBaseSlot % 30) + 1,
+      ((nextBaseSlot + 1) % 30) + 1,
+      ((nextBaseSlot + 2) % 30) + 1
+    ]);
+  } else {
+    // Friday (Lab Day) or Sunday (Rest Day): Zero students on duty today
+    activeIds = new Set();
+
+    // Upcoming duty session: Saturday if Friday, Monday if Sunday
+    const nextDutyIndex = dutyDaysBeforeToday;
+    const nextBaseSlot = (nextDutyIndex * 4) % 30 + 1;
+    tomorrowIds = new Set([
+      nextBaseSlot,
+      (nextBaseSlot % 30) + 1,
+      ((nextBaseSlot + 1) % 30) + 1,
+      ((nextBaseSlot + 2) % 30) + 1
+    ]);
+  }
+
+  const completedInThisCycle = completedCount % 30;
+
+  return initialList.map(s => {
+    let status;
+    let returned = false;
+
+    if (activeIds.has(s.id)) {
+      status = 'active';
+    } else if (tomorrowIds.has(s.id)) {
+      status = 'tomorrow';
+    } else if (completedInThisCycle > 0 && s.id <= completedInThisCycle) {
+      status = 'done';
+      returned = true;
+    } else {
+      status = 'waiting';
+    }
+
+    return {
+      ...s,
+      slotNumber: s.slotNumber || ('#' + String(s.id).padStart(2, '0')),
+      status,
+      returned,
+      room: s.room || 'Room 205 (Building B)',
+      duty: s.duty || 'Prepare projector & clean whiteboard',
+      avatarBg: s.avatarBg || avatarColors[(s.id - 1) % avatarColors.length]
+    };
+  });
+}
+
 export { timetableData };

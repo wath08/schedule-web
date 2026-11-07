@@ -131,7 +131,19 @@ export default function LiveQueuePage() {
 
     squadStudents = studentIds
       .map(id => students.find(s => s.id === id))
-      .filter(Boolean);
+      .filter(Boolean)
+      .map(st => {
+        let cardStatus = st.status;
+        if (selectedDayInfo?.isToday) {
+          cardStatus = 'active';
+        } else if (selectedDayInfo?.isPast) {
+          cardStatus = 'done';
+        }
+        return {
+          ...st,
+          status: cardStatus
+        };
+      });
   }
 
   return (
