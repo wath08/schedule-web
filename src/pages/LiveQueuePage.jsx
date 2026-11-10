@@ -26,13 +26,6 @@ import {
   TOTAL_CLASS_DAYS
 } from '../utils/semester';
 
-const DUTY_ROLES = [
-  'Lead Carrier & Pickup',
-  'Cables & Power Setup',
-  'Whiteboard & Markers',
-  'Safe Return & Storage'
-];
-
 export default function LiveQueuePage() {
   const { 
     students, 
@@ -277,7 +270,7 @@ export default function LiveQueuePage() {
           ) : (
             /* 4 Classmate Cards for Normal Class Days */
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
-              {squadStudents.map((st, idx) => (
+              {squadStudents.map((st) => (
                 <div
                   key={st.id}
                   className="bg-white border-2 border-[#1c1c17] rounded-xl p-3 sm:p-4 shadow-[3px_3px_0px_#1c1c17] flex flex-col justify-between"
@@ -312,9 +305,6 @@ export default function LiveQueuePage() {
                         <h4 className="font-['Space_Grotesk'] font-bold text-base sm:text-lg text-[#1c1c17] truncate leading-tight">
                           {st.name}
                         </h4>
-                        <span className="text-xs font-['Plus_Jakarta_Sans'] font-semibold text-[#1b6b4f] block truncate mt-0.5">
-                          {DUTY_ROLES[idx]}
-                        </span>
                       </div>
                     </div>
 

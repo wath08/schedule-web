@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { 
   Calendar, 
   Clock, 
@@ -17,6 +18,7 @@ import { useApp } from '../context/useApp';
 
 export default function ClassTimetablePage() {
   const { currentDate } = useApp();
+  const location = useLocation();
   const today = currentDate || new Date();
   // Today's day name in local time
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -26,21 +28,50 @@ export default function ClassTimetablePage() {
   // Days list for table
   const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-  // Auto-scroll table on mobile so today's schedule is immediately visible
+  // References for mobile auto-positioning
+  const scheduleSectionRef = useRef(null);
   const tableContainerRef = useRef(null);
   const todayHeaderRef = useRef(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    // Disable native scroll restoration so route transitions and reloads trigger smooth alignment
+    if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+
+    const scrollToPosition = () => {
+      const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
+
+      // On phone size, smoothly scroll down directly to the schedule table
+      if (isMobile && scheduleSectionRef.current) {
+        scheduleSectionRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+
+      // Smoothly center today's schedule column horizontally in the table
       const container = tableContainerRef.current;
       const header = todayHeaderRef.current;
-      if (container && header) {
-        const scrollPos = header.offsetLeft - (container.clientWidth / 2) + (header.clientWidth / 2);
-        container.scrollTo({ left: Math.max(0, scrollPos), behavior: 'smooth' });
+      if (container) {
+        if (header) {
+          const scrollPos = header.offsetLeft - (container.clientWidth / 2) + (header.clientWidth / 2);
+          container.scrollTo({ left: Math.max(0, scrollPos), behavior: 'smooth' });
+        } else {
+          container.scrollTo({ left: 0, behavior: 'smooth' });
+        }
       }
-    }, 150);
-    return () => clearTimeout(timer);
-  }, [todayDayName]);
+    };
+
+    // Staged timeout to ensure smooth execution even on initial render, reload, or tab switch
+    const timer1 = setTimeout(scrollToPosition, 120);
+    const timer2 = setTimeout(scrollToPosition, 380);
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+    };
+  }, [location.key, todayDayName]);
 
   return (
     <div className="flex flex-col gap-8 pb-16">
@@ -133,7 +164,10 @@ export default function ClassTimetablePage() {
       </section>
 
       {/* 2. THE WEEKLY SCHEDULE GRID (MONDAY TO SATURDAY) */}
-      <section className="bg-white border-2 border-[#1c1c17] rounded-2xl p-5 sm:p-6 shadow-[6px_6px_0px_#1c1c17] overflow-hidden">
+      <section 
+        ref={scheduleSectionRef} 
+        className="bg-white border-2 border-[#1c1c17] rounded-2xl p-5 sm:p-6 shadow-[6px_6px_0px_#1c1c17] overflow-hidden scroll-mt-24"
+      >
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b-2 border-[#1c1c17] mb-5">
           <div className="flex items-center gap-2.5">
             <Calendar className="w-5 h-5 text-[#ba1a1a]" />
@@ -154,11 +188,11 @@ export default function ClassTimetablePage() {
 
         {/* Scrollable Responsive Table */}
         <div ref={tableContainerRef} className="overflow-x-auto pb-2 scroll-smooth">
-          <table className="w-full min-w-[760px] border-collapse border-2 border-[#1c1c17] font-['Space_Grotesk'] text-xs">
+          <table className="w-full table-fixed min-w-[850px] border-collapse border-2 border-[#1c1c17] font-['Space_Grotesk'] text-xs">
             {/* Table Header: Days of the week */}
             <thead>
               <tr className="bg-[#1c1c17] text-white">
-                <th className="border-2 border-[#1c1c17] p-3 text-center w-28 uppercase tracking-wider font-bold bg-[#333]">
+                <th className="border-2 border-[#1c1c17] p-3 text-center w-[100px] uppercase tracking-wider font-bold bg-[#333]">
                   <div>Time</div>
                 </th>
                 {weekDays.map(day => {
@@ -167,7 +201,7 @@ export default function ClassTimetablePage() {
                     <th 
                       key={day}
                       ref={isToday ? todayHeaderRef : null}
-                      className={`border-2 border-[#1c1c17] p-2.5 text-center transition-all ${
+                      className={`border-2 border-[#1c1c17] p-2.5 text-center transition-all w-[15%] ${
                         isToday ? 'bg-[#ffe24c] text-[#1c1c17]' : 'bg-[#1c1c17] text-white'
                       }`}
                     >

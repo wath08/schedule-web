@@ -51,16 +51,37 @@ export default function ChromaKeyCatMeme() {
     // Default sound ON: attempt unmuted playback
     video.muted = isMuted;
     video.play().catch(() => {
-      // Fallback if browser requires user gesture prior to unmuting
+      // If browser blocks unmuted autoplay without gesture, listen for first interaction
       video.muted = true;
       setIsMuted(true);
       video.play().catch(() => {});
     });
 
+    // Auto-unmute on first user gesture anywhere on screen
+    const handleFirstGesture = () => {
+      if (video) {
+        video.muted = false;
+        setIsMuted(false);
+        video.play().catch(() => {});
+      }
+      cleanupGestureListeners();
+    };
+
+    const cleanupGestureListeners = () => {
+      window.removeEventListener('click', handleFirstGesture);
+      window.removeEventListener('keydown', handleFirstGesture);
+      window.removeEventListener('touchstart', handleFirstGesture);
+    };
+
+    window.addEventListener('click', handleFirstGesture, { once: true });
+    window.addEventListener('keydown', handleFirstGesture, { once: true });
+    window.addEventListener('touchstart', handleFirstGesture, { once: true });
+
     animId = requestAnimationFrame(render);
 
     return () => {
       cancelAnimationFrame(animId);
+      cleanupGestureListeners();
     };
   }, [isMuted]);
 
