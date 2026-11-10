@@ -64,12 +64,17 @@ export function AppProvider({ children }) {
 
   const restartDutyCycle = () => {
     const now = currentDate || new Date();
-    const { isoDate, isFriday, isSunday } = getNextActiveDutyDate(now);
+    const { isoDate, isFriday, isSunday, isAfter9pm, targetDayName } = getNextActiveDutyDate(now);
 
     setDutyStartDate(isoDate);
     localStorage.setItem('projector_duty_start_date_v5', isoDate);
 
-    if (isFriday) {
+    if (isAfter9pm) {
+      showToast(
+        `Duty cycle reset! Past 9:00 PM — rotation begins ${targetDayName} with Slot #01!`,
+        "success"
+      );
+    } else if (isFriday) {
       showToast(
         "Duty cycle reset! Friday is Lab Day (no projector needed) — rotation begins Saturday with Slot #01!",
         "success"

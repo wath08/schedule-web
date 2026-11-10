@@ -160,7 +160,11 @@ export default function ResetDutyModal() {
         {/* Modal Body */}
         <form onSubmit={handleSign} className="flex flex-col gap-4">
           <p className="font-['Plus_Jakarta_Sans'] text-xs sm:text-sm text-[#48454d] leading-relaxed">
-            {dutyTarget.isFriday ? (
+            {dutyTarget.isAfter9pm ? (
+              <>
+                It is past <strong>9:00 PM at night</strong> (classes ended for today). Resetting will start fresh with Slot #01 on <strong>{dutyTarget.targetDayName}</strong>. Please enter admin password to confirm.
+              </>
+            ) : dutyTarget.isFriday ? (
               <>
                 Today is <strong>Friday Computer Lab Day</strong> (Lab 203 & 204 Building A) — zero projector duty needed today. Resetting will cleanly begin duty on <strong>Saturday with Slot #01</strong>. Please enter admin password to confirm.
               </>

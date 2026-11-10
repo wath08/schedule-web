@@ -188,41 +188,52 @@ export function getCurrentClassDay(date = new Date()) {
   return Math.min(Math.max(classDay, 1), TOTAL_CLASS_DAYS);
 }
 
-// Calculate next active projector duty date (Friday skips to Saturday, Sunday skips to Monday)
+// Calculate next active projector duty date (Friday skips to Saturday, Sunday skips to Monday, and after 9:00 PM advances to next day)
 export function getNextActiveDutyDate(date = new Date()) {
   const d = date instanceof Date ? new Date(date) : parseDate(date);
-  const dow = d.getDay(); // 0 Sun, 1 Mon, 5 Fri, 6 Sat
+  // After 9:00 PM (21:00) at night, evening classes have ended, so duty applies to next day
+  const isAfter9pm = d.getHours() >= 21;
+
+  const effectiveDate = new Date(d);
+  if (isAfter9pm) {
+    effectiveDate.setDate(effectiveDate.getDate() + 1);
+  }
+
+  const dow = effectiveDate.getDay(); // 0 Sun, 1 Mon, 5 Fri, 6 Sat
 
   if (dow === 5) {
     // Friday (Computer Lab Day - no projector needed) -> next duty day is Saturday (+1 day)
-    const next = new Date(d);
-    next.setDate(d.getDate() + 1);
+    const next = new Date(effectiveDate);
+    next.setDate(effectiveDate.getDate() + 1);
     return {
       nextDate: next,
       isoDate: formatISODate(next),
       isFriday: true,
       isSunday: false,
+      isAfter9pm,
       targetDayName: 'Saturday'
     };
   } else if (dow === 0) {
     // Sunday (Weekly Rest Day - no duty) -> next duty day is Monday (+1 day)
-    const next = new Date(d);
-    next.setDate(d.getDate() + 1);
+    const next = new Date(effectiveDate);
+    next.setDate(effectiveDate.getDate() + 1);
     return {
       nextDate: next,
       isoDate: formatISODate(next),
       isFriday: false,
       isSunday: true,
+      isAfter9pm,
       targetDayName: 'Monday'
     };
   }
 
   return {
-    nextDate: d,
-    isoDate: formatISODate(d),
+    nextDate: effectiveDate,
+    isoDate: formatISODate(effectiveDate),
     isFriday: false,
     isSunday: false,
-    targetDayName: d.toLocaleDateString('en-US', { weekday: 'long' })
+    isAfter9pm,
+    targetDayName: effectiveDate.toLocaleDateString('en-US', { weekday: 'long' })
   };
 }
 
