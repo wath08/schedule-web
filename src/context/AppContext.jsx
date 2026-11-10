@@ -3,6 +3,8 @@ import initialStudents from '../data/students.json';
 import { AppContext } from './context';
 import { getNextActiveDutyDate, calculateDynamicRoster } from '../utils/semester';
 
+const SHARED_CLOUD_SYNC_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a1c6126cbd7f81';
+
 export function AppProvider({ children }) {
   // Clear legacy stored states so users get the fresh synchronized state
   useEffect(() => {
@@ -43,6 +45,43 @@ export function AppProvider({ children }) {
     return '2026-11-07';
   });
 
+  // Cross-device cloud sync: ensure all phones, computers, and tablets share the same dutyStartDate
+  useEffect(() => {
+    let isMounted = true;
+
+    const syncFromCloud = async () => {
+      try {
+        const res = await fetch(SHARED_CLOUD_SYNC_URL);
+        if (!res.ok) return;
+        const data = await res.json();
+        const cloudDate = data?.data?.date;
+        if (cloudDate && isMounted) {
+          setDutyStartDate(prev => {
+            if (prev !== cloudDate) {
+              try {
+                localStorage.setItem('projector_duty_start_date_v5', cloudDate);
+              } catch {
+                // ignore
+              }
+              return cloudDate;
+            }
+            return prev;
+          });
+        }
+      } catch {
+        // Fallback to local state if offline or network error
+      }
+    };
+
+    syncFromCloud();
+    const interval = setInterval(syncFromCloud, 20000); // Poll every 20s for real-time sync
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, []);
+
   // Calculate students dynamically in real time from currentDate & dutyStartDate
   const students = useMemo(() => {
     return calculateDynamicRoster(currentDate, dutyStartDate, initialStudents);
@@ -67,7 +106,23 @@ export function AppProvider({ children }) {
     const { isoDate, isFriday, isSunday, isAfter9pm, targetDayName } = getNextActiveDutyDate(now);
 
     setDutyStartDate(isoDate);
-    localStorage.setItem('projector_duty_start_date_v5', isoDate);
+    try {
+      localStorage.setItem('projector_duty_start_date_v5', isoDate);
+    } catch {
+      // ignore
+    }
+
+    // Broadcast reset date to cloud so all other devices update immediately
+    fetch(SHARED_CLOUD_SYNC_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'duty_start_date',
+        data: { date: isoDate }
+      })
+    }).catch(() => {
+      // ignore network errors
+    });
 
     if (isAfter9pm) {
       showToast(
